@@ -19,15 +19,20 @@ const Signup = () => {
       Alert.alert('Error', 'All fields are required');
       return;
     }
-
+  
     setLoading(true);
     try {
+      // Send a POST request to the Django server to create a new user
       const response = await axios.post('http://192.168.1.113:8000/signup/', {
         username,
         email,
         password,
       });
 
+
+  
+      console.log('Response:', response);
+  
       if (response.status === 201) {
         Alert.alert('Success', 'User registered successfully');
         navigation.navigate('Login');
@@ -36,6 +41,7 @@ const Signup = () => {
       }
     } catch (error) {
       setLoading(false);
+      console.error('Error:', error);
       if (error.response) {
         const errorMsg = error.response.data.message || error.response.data.detail || 'Unknown error';
         Alert.alert('Error', errorMsg);
@@ -44,6 +50,7 @@ const Signup = () => {
       }
     }
   };
+  
 
   return (
     <ImageBackground 

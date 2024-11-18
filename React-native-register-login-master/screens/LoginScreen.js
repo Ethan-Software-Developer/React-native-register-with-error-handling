@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, Alert, StyleSheet, ImageBackground, Dimensions } from 'react-native';
 import axios from 'axios';
 import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 
 const { height } = Dimensions.get('window');
 
@@ -9,6 +10,8 @@ const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');  // State to store the user's name
+  const [username, setUsername] = useState('');  // State to store the user's username
 
   // Email validation regex
   const validateEmail = (email) => {
@@ -30,16 +33,27 @@ const Login = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await axios.post('http://192.168.1.113:8000/login/', {
-        email, // Ensure this matches the backend expected parameter
+        email,
         password,
       });
 
       if (response.status === 200) {
         Alert.alert('Success', 'Login successful');
-        // Save token to AsyncStorage or a global state if needed (for authentication)
-        navigation.navigate('Home');
+        
+        // Assuming the response includes the user's data (name, username, and email)
+        const { name, username, email } = response.data;
+        
+        // Save the name and username in the state
+        setName(name);
+        setUsername(username);
+
+        // Optionally store the data in AsyncStorage for persistence across app restarts
+        // AsyncStorage.setItem('userData', JSON.stringify({ name, username, email }));
+
+        // Navigate to Profile screen, passing the name, username, and email
+        navigation.navigate('MyProfile', { name, username, email });
+        
       } else {
-        // Handle invalid credentials or unexpected errors
         Alert.alert('Error', response.data.message || 'Invalid credentials');
       }
     } catch (error) {
@@ -159,4 +173,3 @@ const styles = StyleSheet.create({
 });
 
 export default Login;
-
